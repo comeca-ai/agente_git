@@ -1,0 +1,808 @@
+
+Você disse:
+como posso criar agentes onde eu dou a ideia e ele faz o aplicativo ponta a ponta segundo o protocolo a seguir e ainda seguindo os guidelines da openai - 🧱 TEMPLATE OFICIAL — MCP + React (base limpa)
+📁 Project Layout (recomendado)
+meu-chatgpt-app/
+├─ server/
+│  └─ src/
+│     └─ index.ts          # MCP server + tools (backend)
+├─ web/
+│  ├─ src/
+│  │  └─ App.tsx           # Widget principal (React)
+│  ├─ public/
+│  ├─ vite.config.ts
+│  └─ dist/                # Gerado automaticamente
+├─ package.json
+├─ tsconfig.json
+└─ README.md
+
+
+Esse layout:
+
+✅ segue o padrão do Apps SDK
+
+✅ separa responsabilidades
+
+✅ funciona bem em dev e produção
+
+✅ evita decisões prematuras
+
+🧰 STACK RECOMENDADA (com UX nativa)
+Backend (MCP Server)
+
+Node.js ≥ 18
+
+TypeScript
+
+@modelcontextprotocol/sdk
+
+zod
+
+FastMCP-style UX (schemas + tools claros)
+
+Frontend (Widget)
+
+React
+
+Vite
+
+CSS simples (ou Tailwind depois)
+
+window.openai (UX nativa do ChatGPT)
+
+📌 Nada de frameworks pesados agora
+📌 A UX “nativa” vem do MCP + tools bem definidas
+
+📦 INSTALAÇÃO (passo a passo limpo)
+1️⃣ Inicializar projeto
+mkdir meu-chatgpt-app
+cd meu-chatgpt-app
+npm init -y
+
+2️⃣ Instalar dependências do MCP Server
+npm install @modelcontextprotocol/sdk zod
+npm install -D typescript ts-node @types/node
+
+
+Criar TypeScript config:
+
+npx tsc --init
+
+3️⃣ Criar frontend (widget)
+cd meu-chatgpt-app
+npm create vite@latest web -- --template react-ts
+cd web
+npm install
+
+
+📌 Isso cria:
+
+React
+
+Vite
+
+HMR
+
+build para dist/
+
+4️⃣ Criar pastas do servidor
+cd ..
+mkdir -p server/src
+
+🧩 TEMPLATE DE ARQUIVOS (sem lógica)
+server/src/index.ts
+/**
+ * MCP Server – template base
+ * Aqui ficam apenas:
+ * - definição de tools
+ * - schemas
+ * - registro de widgets
+ */
+
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
+const server = new McpServer({
+  name: "meu-chatgpt-app",
+  version: "0.1.0",
+});
+
+// 🔹 PONTO DE ENTRADA PARA DEFINIR A IDEIA DO APP
+// Descreva mentalmente:
+// - qual problema resolve
+// - que dados expõe
+// - que ações o usuário pode tomar
+//
+// Exemplo (não implementar agora):
+// - listar algo
+// - visualizar algo
+// - interagir com algo
+
+server.start({ port: 3333 });
+
+console.log("MCP Server rodando em http://localhost:3333");
+
+web/src/App.tsx
+/**
+ * Widget React – template base
+ * Não coloque lógica de negócio aqui.
+ */
+
+export default function App() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h2>Meu ChatGPT App</h2>
+      <p>Widget carregado com sucesso.</p>
+    </div>
+  );
+}
+
+README.md (template inicial)
+# Meu ChatGPT App (MCP)
+
+## Ideia do App (defina antes de codar)
+Responda antes de continuar:
+
+- Que problema esse app resolve?
+- Quem é o usuário?
+- Que ações o usuário espera?
+- O que precisa vir de backend?
+- O que é só visual (widget)?
+
+## Stack
+- MCP Server (Node + TypeScript)
+- React + Vite (Widget)
+- Zod (schemas)
+
+## Scripts
+- build widget
+- rodar server
+- testar via MCP Inspector
+
+## Próximo passo
+Definir 1 tool clara que represente a principal intenção do usuário.
+
+🧠 UX NATIVA (IMPORTANTE)
+
+A UX nativa não vem de UI bonita, vem de:
+
+tools bem nomeadas
+
+schemas claros
+
+respostas previsíveis
+
+widgets simples
+
+📌 Estilo FastMCP:
+
+um tool = uma intenção
+
+sem “do_everything”
+
+schema explícito
+
+retorno enxuto
+
+Isso faz o modelo:
+
+entender melhor
+
+errar menos
+
+agir com mais autonomia
+
+🧠 PROMPT PARA GERAR ESTE TEMPLATE (copiável)
+
+Use esse prompt se quiser gerar ou regenerar o projeto:
+
+Crie um template base para um ChatGPT App usando MCP (Model Context Protocol),
+com separação clara entre backend (MCP Server) e frontend (widget).
+
+Requisitos:
+- Backend em Node.js + TypeScript
+- Uso do SDK oficial @modelcontextprotocol/sdk
+- Estrutura com pasta server/src/index.ts
+- Widget em React usando Vite
+- Sem lógica de negócio implementada
+- Apenas boilerplate mínimo
+- Incluir um ponto inicial para o usuário definir a ideia do app
+- Priorizar UX nativa do ChatGPT (tools + schemas, estilo FastMCP)
+- Não implementar ferramentas concretas
+- Não adicionar funcionalidades extras
+- Código simples, comentado e extensível
+
+🧠 REGRA FINAL (guarde isso)
+
+Não comece codando tools.
+Comece definindo a ideia do app.
+
+A ideia define:
+
+quantos tools
+
+que schemas
+
+se precisa widget complexo ou simples
+
+Se quiser, no próximo passo posso somente:
+
+ajudar você a formular a ideia do app
+
+ou transformar a ideia em 1 tool bem definida
+
+👉 Diga apenas:
+“vamos definir a ideia” ou “vamos para a primeira tool” posso usar agum tookit tipo swarm?
+O ChatGPT disse:
+
+Pensamento por 8 minutos e 40 segundos
+Dá sim — mas vale separar duas coisas diferentes:
+O seu ChatGPT App (runtime) → é o que roda dentro do ChatGPT, e aí o padrão é Apps SDK + MCP server + Widget (React/Vite), exatamente como no seu template. 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+O “agente construtor” (dev-time) → é o sistema que você usa fora do ChatGPT para transformar uma ideia em código (server + web + tools + schemas + testes).
+Para o item (2), você pode usar algo “tipo Swarm”, mas hoje a recomendação prática é:
+Swarm: é explicitamente um framework educacional/experimental de orquestração multi-agente. 
+GitHub
+OpenAI Agents SDK (TS/JS): é descrito como upgrade production-ready do Swarm, já com loop de agente, handoffs, guardrails e tracing. 
+Páginas do GitHub da OpenAI
++
+2
+Páginas do GitHub da OpenAI
++
+2
+Recomendações objetivas
+Se você quer “da ideia ao app ponta a ponta” com qualidade
+Use OpenAI Agents SDK para orquestrar um pipeline de especialistas (PM → arquiteto MCP → dev backend → dev widget → QA/review).
+Ele já tem o conceito de handoffs (um agente transfere para outro), e isso encaixa perfeito nesse fluxo. 
+Páginas do GitHub da OpenAI
++
+1
+Observação prática: o Agents SDK (JS/TS) pede Node.js 22+ . Seu MCP server pode continuar em Node 18+, mas o “construtor” rodaria em Node 22 (pode ser numa pasta separada, container, ou usando Bun/Deno).
+GitHub
+Se você quer só brincar/prototipar
+Swarm funciona, mas trate como protótipo e espere ter que “graduar” pra Agents SDK quando for sério. 
+GitHub
++
+1
+Como desenhar um “App Builder Agent” que respeita MCP + seu template + guidelines
+A ideia é transformar seu protocolo em artefatos que os agentes produzem e validam.
+1) Defina o contrato de saída do “construtor”
+Antes de gerar código, o agente precisa gerar um AppSpec (JSON + markdown) com coisas bem objetivas:
+Problema e usuário
+1 intenção principal (MVP)
+lista de tools (1 tool = 1 intenção, estilo FastMCP)
+esquemas (Zod) de entrada/saída por ferramenta
+anotações (readOnlyHint, openWorldHint, destructiveHint) quando aplicável
+mapa do widget (quais estados e quais ações chamam window.openai.callTool)
+limites de dados: o que vai em structuredContent vs _meta
+Isso bate com o que o Apps SDK espera: tools bem descritas, servidor definindo tools + apontando UI bundle, widget lendo window.openai, e o modelo decidindo quando chamar tool. 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+2) Embuta os “guidelines” como uma etapa de Review automatizada
+Duas fontes principais pra você automatizar checklist:
+(A) Diretrizes para envio de aplicativos (SDK de aplicativos)
+Elas falam diretamente de tools como “manual do ChatGPT”:
+nome claro e específico
+descrição que bate com comportamento
+inputs mínimos e purpose-driven
+anotações corretas (readOnlyHint, openWorldHint, destructiveHint) — erro aqui é causa comum de rejeição
+comportamento previsível e “auditável” 
+Desenvolvedores da OpenAI
+(B) Segurança e Privacidade (SDK de Aplicativos)
+Pontos que seu “agente construtor” tem que forçar no projeto:
+privilégio mínimo
+consentimento explícito pra ações de escrita
+defesa em profundidade (injeção imediata de assuma)
+validar tudo server-side
+registros sem PII
+não colocar segredo/token em props e manter structuredContent enxuto 
+Desenvolvedores da OpenAI
+E um detalhe super importante do widget:
+tudo que você manda em setWidgetState pode ser mostrado ao modelo
+Então: nada de segredo no widgetState e payload pequeno. 
+Desenvolvedores da OpenAI
++
+1
+Arquitetura de agentes recomendada (simples e eficiente)
+Você pode ter 1 agente “triagem/orquestrador” + 4 especialistas:
+Agent PM (Spec): transforma “ideia” em AppSpec (MVP, 1 tool principal)
+Agent MCP Designer: desenha tools + schemas + anotações + outputTemplate
+Backend do agente : implementa server/src/index.ts(registerResource + registerTool)
+Widget do Agente : implementação ( web/src/App.tsxmas toolOutput, EUA callTool)setWidgetState
+Agent QA/Compliance: roda checklist + sugere correções (idempotência, privacidade, tool naming)
+O orquestrador decide quando transferir (handoff) para cada especialista.
+Isso é exatamente o caso de uso de handoffs (delegar para especialistas). 
+Páginas do GitHub da OpenAI
++
+1
+Exemplo prático usando OpenAI Agents SDK (TypeScript)
+Instalação do “construtor” (dev-time)
+Em uma pasta tipo builder/(separada do servidor MCP, se você quiser manter o Node 18 lá):
+# requer Node 22+ (ou Bun/Deno)
+npm install @openai/agents zod@3
+GitHub
+Esqueleto de orquestração com handoffs
+// builder/run.ts
+import { Agent, handoff, run } from "@openai/agents";
+import { z } from "zod";
+
+const AppSpecSchema = z.object({
+  appName: z.string(),
+  problem: z.string(),
+  targetUser: z.string(),
+  primaryIntent: z.string(),
+  tools: z.array(
+    z.object({
+      name: z.string(),
+      title: z.string(),
+      description: z.string(),
+      annotations: z.object({
+        readOnlyHint: z.boolean().optional(),
+        openWorldHint: z.boolean().optional(),
+        destructiveHint: z.boolean().optional(),
+      }).optional(),
+      input: z.any(),
+      output: z.any(),
+      widgetTemplateUri: z.string(),
+    })
+  ),
+  widget: z.object({
+    stateKeys: z.array(z.string()),
+    actions: z.array(z.string()),
+  }),
+});
+
+const specAgent = new Agent({
+  name: "Spec Agent",
+  instructions: `
+Você transforma uma ideia de app em um AppSpec JSON (MVP).
+Regras:
+- 1 tool principal (1 intenção)
+- Inputs mínimos (sem pedir histórico inteiro)
+- Nome de tool como verbo + objeto (ex: list_tasks)
+- Descrição fiel ao que vai implementar
+- Explique o que vai para structuredContent vs _meta
+Retorne APENAS JSON válido.
+`,
+});
+
+const mcpAgent = new Agent({
+  name: "MCP Agent",
+  instructions: `
+Você recebe o AppSpec e devolve um "plano de implementação" para:
+- server/src/index.ts (McpServer + registerResource + registerTool)
+- usar text/html+skybridge no template
+- retornar structuredContent (enxuto) e _meta (para widget)
+Respeite: idempotência e retries.
+`,
+  handoffDescription: "Especialista em MCP + Apps SDK",
+});
+
+const widgetAgent = new Agent({
+  name: "Widget Agent",
+  instructions: `
+Você recebe o AppSpec e devolve um plano de widget React:
+- ler window.openai.toolOutput
+- persistir estado com setWidgetState (sem segredos, payload pequeno)
+- acionar server via window.openai.callTool quando necessário
+`,
+  handoffDescription: "Especialista em widget React + window.openai",
+});
+
+const complianceAgent = new Agent({
+  name: "Compliance Agent",
+  instructions: `
+Você faz review com base em:
+- Tool naming, descrições, inputs mínimos, anotações (readOnlyHint/openWorldHint/destructiveHint)
+- Segurança e privacidade: least privilege, validação server-side, logs sem PII, nada de segredo em props/widgetState
+Retorne uma lista curta de problemas e correções.
+`,
+  handoffDescription: "Revisor de guidelines Apps SDK",
+});
+
+// Orquestrador: decide para quem passar
+const triage = Agent.create({
+  name: "App Builder Orchestrator",
+  instructions: `
+Você orquestra a construção de um ChatGPT App (Apps SDK + MCP + React/Vite).
+Fluxo:
+1) Gerar AppSpec (JSON)
+2) Pedir plano MCP
+3) Pedir plano Widget
+4) Pedir review de compliance
+Entregue no final:
+- AppSpec validado
+- Plano de arquivos a criar/alterar
+- Checklist final
+`,
+  handoffs: [
+    handoff(specAgent),
+    handoff(mcpAgent),
+    handoff(widgetAgent),
+    handoff(complianceAgent),
+  ],
+});
+
+async function main() {
+  const idea = process.argv.slice(2).join(" ") || "Um app de exemplo";
+  const result = await run(triage, `Ideia do app: ${idea}`);
+  console.log(result.finalOutput);
+}
+
+main().catch(console.error);
+Por que isso funciona bem:
+o SDK já implementa o loop do agente (tool calls / handoff / final output). 
+Páginas do GitHub da OpenAI
+handoffs viram “tools” de transferência para especialistas. 
+Páginas do GitHub da OpenAI
+(Para rodar de verdade você vai precisar do OPENAI_API_KEY no ambiente.) 
+GitHub
+Como conectar isso ao seu template MCP + React (runtime)
+Quando os agentes forem implementar (não só “planejar”), eles precisam respeitar estes pontos do Apps SDK:
+Backend MCP (servidor)
+O MCP server define tools e aponta cada tool para um template de UI. 
+Desenvolvedores da OpenAI
++
+1
+UI bundle precisa ser servido como resource com mimeType: "text/html+skybridge". 
+Desenvolvedores da OpenAI
+Resposta da ferramenta separada:
+structuredContent (vai pro modelo: enxuto, sem segredos)
+_meta (vai só pro widget: pode ser grande/sensível)
+content (texto opcional) 
+Desenvolvedores da OpenAI
+Widget React
+window.openai.callTool(...) para ações diretas (refresh etc). 
+Desenvolvedores da OpenAI
+setWidgetState(...)persiste estado e é visível ao modelo → sem segredos e pequeno.
+Desenvolvedores da OpenAI
++
+1
+Debug e validação (pra fechar o ciclo)
+Inclua no pipeline do “construtor” uma etapa obrigatória de teste com MCP Inspector (ele existe justamente pra testar servers MCP). 
+Protocolo de Contexto do Modelo
++
+1
+Respondendo direto: “posso usar Swarm?”
+Pode, mas:
+Swarm → bom pra aprender/prototipar; é explicitamente educacional. 
+GitHub
+Agents SDK → é o caminho mais “padrão OpenAI” hoje pra produção e já se posiciona como upgrade do Swarm. 
+Páginas do GitHub da OpenAI
+Se quiser, eu já adapto esse “App Builder” para o seu protocolo exatamente (incluindo regras do seu template e o estilo FastMCP) em dois modos:
+Modo seguro: o agente gera patches (diff) e você aplica.
+Modo autônomo: o agente tem tools de filesystem (write/read) + run com allowlist + aprovação humana.
+Você quer seguir qual modo?
+Você disse:
+Agents SDK e com essas melhorias e fastpmcp, de forma que seja aprovada pelo chatgpt app, como fica o novo fluxo de agentes, quais melhores ferramentas
+O ChatGPT disse:
+
+Pensamento por 8 minutos e 59 segundos
+A forma mais “review‑ready” de fazer isso com Agents SDK + estilo FastMCP é transformar seu “agente construtor” num pipeline com gates (etapas obrigatórias) que geram artefatos claros e passam por validações alinhadas ao Apps SDK. Abaixo vai um novo fluxo de agentes (bem prático) e as melhores ferramentas para dar a esses agentes — com foco em maximizar a chance de aprovação (não dá pra prometer 100%, porque a revisão pode envolver checagens automáticas e humanas, mas isso deixa você muito perto do padrão esperado). 
+Desenvolvedores da OpenAI
++
+1
+O fluxo “novo” de agentes (Agents SDK + FastMCP + App review)
+Por que este fluxo?
+Porque o Apps SDK é muito sensível a:
+metadados de tool (nome/descrição/parâmetros) e anotações (readOnlyHint, openWorldHint, destructiveHint) — erro aqui é causa comum de rejeição 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+segurança/privacidade (segredos, validação do lado do servidor, “menos privilégio”, CSP do widget)
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+teste com MCP Inspector + golden prompts antes de submeter 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+Então o pipeline precisa “forçar” essas etapas.
+Padrão de orquestração recomendado
+Use “agente central orquestrador + especialistas como ferramentas” (agents-as-tools) ao invés de handoffs livres.
+Handoffs são ótimos, mas para um “construtor de app” você quer controle central, com gates e regressão.
+O Agents SDK foi feito justamente pra orquestração, guardrails e tracing. 
+OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+Pipeline em 8 etapas (com gates)
+Etapa 0 — Intake e classificação (Triage/PM Agent)
+Entrada: sua ideia em linguagem natural
+Saída (artefato): app_spec.json (MVP) + “não‑objetivos” (o que NÃO vai fazer) Gate obrigatório:
+definir 1 intenção principal (MVP)
+definir limites de dados (o que vai em structuredContent vs _meta) 
+Desenvolvedores da OpenAI
++
+1
+Dica de aprovação: menos escopo → menos tools → menos chance de tool errado disparar.
+Etapa 1 — Projeto de Ferramenta (Agente de Ferramentaria no estilo FastMCP)
+Objetivo: desenhar tools no estilo “FastMCP”: 1 tool = 1 intenção, schema explícito, retorno previsível. Saídas:
+tools.contract.json contendo, para cada tool:
+name(verbo + objeto / domínio.ação)
+description começando com “Use this when…” e listando casos proibidos
+inputSchema/outputSchema
+annotations: readOnlyHint, openWorldHint, destructiveHint, e quando fizer sentido idempotentHint 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+_meta["openai/outputTemplate"] (qual widget renderiza) 
+Desenvolvedores da OpenAI
++
+1
+Gate obrigatório (anti‑rejeição):
+TODA tool tem as hints corretas (e justificável) 
+Desenvolvedores da OpenAI
++
+1
+Etapa 2 — Metadados e Descoberta (Agente de Descoberta)
+Objetivo: garantir que o modelo chama a tool certa, na hora certa. Saídas:
+golden_prompts.json (diretos / indiretos / negativos)
+metadata.copy.md com descrições revisadas (“Use this when…”, “Do not use for…”) 
+Desenvolvedores da OpenAI
++
+1
+Gate obrigatório:
+rodar golden prompts em dev mode (ou pelo menos preparar o dataset + expectativa por prompt) 
+Desenvolvedores da OpenAI
++
+1
+Etapa 3 — Arquitetura MCP + UI (Architect Agent)
+Decidir:
+Quais tools precisam de widget
+O que é “UI-only action” (refresh, paginar, ordenar etc)
+Pontos críticos (Apps SDK):
+Se o widget vai chamar tool por botão/refresh, marcar a tool com _meta["openai/widgetAccessible"]=true 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+Se existir tool que o modelo não deveria ver, mas o widget pode chamar, usar _meta["openai/visibility"]="private" (isso reduz tool call “estranho” por texto) 
+Desenvolvedores da OpenAI
++
+1
+Etapa 4 — Implementação MCP Server (Backend Agent)
+Saídas (código):
+server/src/index.ts com:
+registerResourcefazer HTML text/html+skybridge(modelo de widget)
+Desenvolvedores da OpenAI
++
+1
+openai/widgetCSP com allowlist mínima (connect/resource/frame/redirect domains) — isso é importante para submissão e segurança 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+registerToolcom outputTemplate, esquemas e anotações
+Gate obrigatório (segurança):
+tratar structuredContent, content, _meta e widget state como user-visible (sem chaves/tokens/segredos) 
+Desenvolvedores da OpenAI
++
+3
+Desenvolvedores da OpenAI
++
+3
+Desenvolvedores da OpenAI
++
+3
+validação server-side sempre (defense-in-depth contra prompt injection)
+Desenvolvedores da OpenAI
++
+1
+Etapa 5 — Implementação Widget (Frontend Agent)
+Saídas (código):
+web/src/App.tsx (ou component.tsx) usando:
+window.openai.toolOutput(conteúdo estruturado)
+window.openai.toolResponseMetadata (_meta, só widget)
+window.openai.widgetState+ setWidgetState(persistir estado da interface do usuário)
+Desenvolvedores da OpenAI
++
+1
+window.openai.callTool(...) para refresh/ações diretas (quando marcado widgetAccessible) 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+Gate obrigatório:
+widgetState pequeno (a doc alerta que tudo que você passa é mostrado ao modelo; manter focado e abaixo de ~4k tokens) 
+Desenvolvedores da OpenAI
++
+1
+Etapa 6 — Garantia de Qualidade Técnica (Agente de Garantia de Qualidade)
+Executar:
+npm run build(web) + servidor de compilação
+smoke test do servidor
+MCP Inspector: listar tools, chamar tool, ver widget renderizar 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+Saídas:
+qa_report.md
+screenshots do Inspector (úteis até pra launch review) 
+Desenvolvedores da OpenAI
++
+1
+Etapa 7 — Conformidade (Agente de Revisão de Aplicativos)
+Verificar em relação a:
+Diretrizes para submissão de aplicativos
+Desenvolvedores da OpenAI
++
+1
+Segurança e Privacidade
+Desenvolvedores da OpenAI
++
+1
+Reference (campos obrigatórios, widgetAccessible, visibility, annotations etc) 
+Desenvolvedores da OpenAI
++
+1
+Gate obrigatório:
+“tool names/signatures/descriptions” congeladas antes de submeter (porque mudanças depois exigem resubmissão) 
+Desenvolvedores da OpenAI
+Quais são as melhores “ferramentas” para dar aos agentes?
+Aqui vale separar em 2 categorias: ferramentas do agente construtor (dev‑time) vs tools do seu app (runtime).
+A) Ferramentas do agente construtor (dev‑time)
+1) Tools nativas/estruturais do Agents SDK (vale MUITO usar)
+O Agents SDK tem primitives e ferramentas para orquestrar e controlar fluxo:
+Guardrails (entrada/saída): para forçar JSON válido, impedir “tool gigante”, e bloquear vazamento de segredo 
+OpenAI
++
+1
+Tracing (por padrão): para depurar onde o agente errou (qual tool chamou, qual schema gerou etc.) 
+Páginas do GitHub da OpenAI
++
+1
+Human-in-the-loop approvals: excelente para “ações sensíveis” do construtor (ex.: publicar, mexer em secrets, rodar comandos perigosos). Você marca tool com needsApproval. 
+Páginas do GitHub da OpenAI
+Structured Outputs (na plataforma): para o Spec Agent sempre produzir app_spec.json válido 
+Plataforma OpenAI
+2) Toolset mínimo que eu recomendo pro “Builder”
+Você dá isso como Function Tools (funções locais) ou como MCP server local acoplado ao Agents SDK. O guia do Agents SDK lista MCP servers e function tools como categorias suportadas. 
+Páginas do GitHub da OpenAI
++
+1
+ Essenciais:
+repo.readFile(path)
+repo.writeFile(path, content) (quase sempre com approval ou pelo menos em modo diff)
+repo.applyPatch(unifiedDiff | v4aDiff) (ideal)
+repo.listTree(glob?)
+cmd.run(command, args, cwd)com lista de permissões ( npm, node, tsc, vite)
+validate.jsonAgainstZod(schemaName, json)(contratos/especificações pra)
+Muito úteis (pra aprovação):
+7. appsSdk.checkTools(contract)
+verifica: annotations completas, names ok, descrição “Use this when…”, outputTemplate setado, widgetAccessible quando necessário, etc. 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+security.scanNoSecrets()
+grep por sk-, tokens, .env exposto, secrets em structuredContent/_meta/widgetState 
+Desenvolvedores da OpenAI
++
+1
+3) Melhor “tool de programação” pronta: Codex como MCP server
+Se você quer um construtor realmente “ponta a ponta”, uma abordagem muito forte é:
+Rodar Codex CLI como um MCP server
+Orquestrar pelo Agents SDK (com handoffs/guardrails/traces)
+Isso está documentado como fluxo para criar pipelines de software delivery mais determinísticos e auditáveis. 
+Desenvolvedores da OpenAI
+B) “Melhores tools” do seu app (runtime) no estilo FastMCP
+Aqui é o que mais impacta aprovação e UX nativa:
+1) Conjunto base (quase sempre)
+list_<recurso>(readOnlyHint: true)
+get_<recurso>(readOnlyHint: true)
+create_<recurso> (write → openWorld/destructive conforme caso)
+update_<recurso>(escrever)
+delete_<recurso>(dica destrutiva: verdadeiro)
+Desenvolvedores da OpenAI
++
+1
+2) Tools para widget interativo
+refresh_<coisa> com _meta["openai/widgetAccessible"]=true pra botão “Atualizar” no widget 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+Se for “só do widget”, deixe private pra não aparecer pro modelo:
+_meta["openai/visibility"]="private" 
+Desenvolvedores da OpenAI
++
+1
+3) Regras que evitam rejeição e bugs
+Tool idempotente quando possível (ChatGPT pode retry). Marque idempotentHint quando fizer sentido e implemente idempotência de verdade. 
+Desenvolvedores da OpenAI
++
+1
+structuredContent enxuto (o modelo lê isso “verbatim”), e _meta para payload grande/sensível do widget. 
+Desenvolvedores da OpenAI
++
+1
+Checklist rápido “aprovação‑friendly” (o que seu fluxo precisa garantir)
+Annotations corretas em TODAS as tools (readOnlyHint, openWorldHint, destructiveHint) 
+Desenvolvedores da OpenAI
++
+1
+CSP do widget (allowlist mínima; frame_domainsapenas se inevitável porque aumenta o escrutínio)
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+Sem segredos em structuredContent, _meta, content e widgetState 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+Teste com MCP Inspector + evidências (screenshots) 
+Desenvolvedores da OpenAI
++
+2
+Desenvolvedores da OpenAI
++
+2
+Golden prompt set rodado e iterado (descoberta/precisão/negativos) 
+Desenvolvedores da OpenAI
++
+1
+Congelar tools antes de submit (mudou assinatura/descrição? normalmente é resubmissão) 
+Desenvolvedores da OpenAI
+Em uma frase: “como fica o novo fluxo?”
+Orquestrador central (Agents SDK) → Spec → Toolsmith (estilo FastMCP) → Implementação (servidor/web) → QA (Inspector + builds) → Compliance (diretrizes + segurança/privacidade) → Freeze + Submit. Se você quiser, eu te passo um esqueleto completo do “builder/” em TypeScript usando @openai/agents com:
+agentes (Especificação/Ferramentas/Backend/Frontend/QA/Conformidade),
+ferramentas de função (repo/cmd),
+aprovações (necessita de aprovação),
+e um “AppsSDK linter” que valida annotations + _meta obrigatório.
+Mas mesmo sem eu ver seu repositório, o desenho acima já é o padrão mais seguro e alinhado ao que o Apps SDK documenta O que é o App Bíblia Diária
+
+  É um app integrado ao ChatGPT que entrega versículos bíblicos diários para inspiração espiritual. Funciona assim:
+
+  Na prática, como o usuário usa:
+
+  1. Dentro do ChatGPT, o usuário fala naturalmente:
+    - "Me dê um versículo para hoje"
+    - "Quero um versículo de Salmos"
+    - "Quais livros da Bíblia você tem?"
+  2. O ChatGPT chama automaticamente uma das 3 ferramentas:
+    - obter_versiculo_diario - versículo aleatório
+    - obter_versiculo_por_livro - versículo de livro específico
+    - listar_livros_disponiveis - lista todos os livros
+  3. O servidor responde com um versículo formatado (ex: "João 3:16 - Porque Deus amou o mundo...")
+  4. O ChatGPT apresenta o versículo de forma conversacional ao usuário
