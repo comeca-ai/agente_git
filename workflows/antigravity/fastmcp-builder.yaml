@@ -1,0 +1,366 @@
+# Google AntiGravity Workflow - FastMCP Builder
+# Este workflow automatiza a criação de apps MCP seguindo OpenAI Guidelines
+
+name: "FastMCP App Builder"
+description: "Cria aplicação MCP compliant com OpenAI Apps SDK"
+version: "1.0.0"
+
+# Trigger: Quando usuário solicita criação de app MCP
+triggers:
+  - type: "user_command"
+    patterns:
+      - "criar app mcp"
+      - "novo app chatgpt"
+      - "fastmcp app"
+      - "criar servidor mcp"
+
+# Variáveis de ambiente
+env:
+  FASTMCP_VERSION: "1.0.0"
+  MCP_SDK_VERSION: "1.25.1"
+  ZOD_VERSION: "4.2.1"
+
+# Workflow Steps seguindo nosso builder
+steps:
+  # ============================================
+  # PASSO 1: Define Use Case (OpenAI Framework)
+  # ============================================
+  
+  - id: "gather_use_case"
+    name: "Coletar Informações do Caso de Uso"
+    type: "interactive_prompt"
+    prompts:
+      - id: "problem"
+        question: "Qual problema seu app resolve?"
+        required: true
+        store_as: "app_problem"
+        
+      - id: "user"
+        question: "Quem é o usuário-alvo?"
+        required: true
+        store_as: "app_user"
+        
+      - id: "name"
+        question: "Nome do seu app (formato: kebab-case):"
+        required: true
+        validation:
+          pattern: "^[a-z0-9-]+$"
+          message: "Use apenas letras minúsculas, números e hífens"
+        store_as: "app_name"
+        
+      - id: "description"
+        question: "Descrição curta (1 linha):"
+        required: true
+        store_as: "app_description"
+  
+  # Interface Visual (UI Guidelines)
+  - id: "gather_ui_requirements"
+    name: "Requisitos de Interface Visual"
+    type: "interactive_prompt"
+    prompts:
+      - id: "has_ui"
+        question: "O app terá interface visual?"
+        type: "boolean"
+        default: false
+        store_as: "has_ui"
+  
+  - id: "ui_details"
+    name: "Detalhes da Interface"
+    type: "conditional"
+    condition: "${has_ui} == true"
+    steps:
+      - id: "ui_type"
+        type: "select"
+        question: "Tipo de interface:"
+        options:
+          - value: "widget"
+            label: "Widget React (cards, listas, gráficos)"
+          - value: "canvas"
+            label: "Canvas (visualizações customizadas)"
+          - value: "form"
+            label: "Form (entrada de dados estruturados)"
+          - value: "mixed"
+            label: "Mista (combinação de tipos)"
+        store_as: "ui_type"
+        
+      - id: "ui_components"
+        type: "text"
+        question: "Que componentes precisa? (ex: tabela, gráfico, formulário)"
+        store_as: "ui_components"
+        
+      - id: "use_ui_agent"
+        type: "boolean"
+        question: "Criar agente especializado em UI Guidelines?"
+        default: true
+        store_as: "use_ui_agent"
+        description: |
+          Agente que garante:
+          - Uso de widgets nativos do ChatGPT
+          - Design responsivo e acessível
+          - Performance <100ms render
+          - Seguir patterns do ChatGPT
+  
+  # ============================================
+  # PASSO 2: Identify Capabilities (Tools)
+  # ============================================
+  
+  - id: "gather_tools"
+    name: "Definir Tools (FastMCP: 1-3 máximo)"
+    type: "interactive_loop"
+    description: |
+      Princípio FastMCP: 1 tool = 1 intention
+      Máximo recomendado: 3 tools
+    prompts:
+      - id: "tool_count"
+        question: "Quantas tools? [1-3]:"
+        type: "number"
+        min: 1
+        max: 3
+        required: true
+        store_as: "tool_count"
+    
+    loop:
+      count: "${tool_count}"
+      steps:
+        - id: "tool_name"
+          question: "Nome da tool ${loop_index}:"
+          validation:
+            pattern: "^[a-z_]+$"
+            message: "Use snake_case (ex: obter_clima)"
+          store_as: "tools[${loop_index}].name"
+          
+        - id: "tool_description"
+          question: "Descrição (o que faz?):"
+          required: true
+          store_as: "tools[${loop_index}].description"
+          
+        - id: "tool_params"
+          question: "Parâmetros (separados por vírgula ou 'nenhum'):"
+          default: "nenhum"
+          store_as: "tools[${loop_index}].params"
+  
+  # ============================================
+  # PASSO 3: Orchestration (Agentes)
+  # ============================================
+  
+  - id: "gather_agents"
+    name: "Sistema de Agentes (Opcional)"
+    type: "interactive_prompt"
+    prompts:
+      - id: "use_agents"
+        question: "Usar sistema de agentes?"
+        type: "boolean"
+        default: false
+        store_as: "use_agents"
+  
+  - id: "agent_setup"
+    name: "Configurar Agentes"
+    type: "conditional"
+    condition: "${use_agents} == true"
+    steps:
+      # Auto-incluir UIGuidelinesAgent se tem UI
+      - id: "auto_ui_agent"
+        type: "conditional"
+        condition: "${use_ui_agent} == true"
+        action:
+          type: "set_variable"
+          name: "agents"
+          value:
+            - name: "UIGuidelinesAgent"
+              role: "Especialista em OpenAI UI Guidelines - garante design acessível, responsivo e seguindo patterns do ChatGPT"
+      
+      - id: "extra_agents"
+        type: "interactive_loop"
+        question: "Quantos agentes adicionais? [0-3]:"
+        max: 3
+        loop:
+          count: "${extra_agent_count}"
+          steps:
+            - id: "agent_name"
+              question: "Nome do agente:"
+              store_as: "agents[].name"
+            - id: "agent_role"
+              question: "Função/especialidade:"
+              store_as: "agents[].role"
+  
+  # ============================================
+  # GERAÇÃO DE CÓDIGO
+  # ============================================
+  
+  - id: "show_summary"
+    name: "Resumo do App"
+    type: "display"
+    template: |
+      📋 RESUMO DO SEU APP
+      
+      App: ${app_name}
+      Problema: ${app_problem}
+      Usuário: ${app_user}
+      Descrição: ${app_description}
+      
+      ${if has_ui}
+      Interface: Sim
+        Tipo: ${ui_type}
+        Componentes: ${ui_components}
+        ${if use_ui_agent}✓ Com agente de UI Guidelines${endif}
+      ${endif}
+      
+      Tools (${tool_count}):
+      ${for tool in tools}
+        ${loop_index}. ${tool.name} - ${tool.description}
+           ${if tool.params != 'nenhum'}Parâmetros: ${tool.params}${endif}
+      ${endfor}
+      
+      ${if use_agents}
+      Agentes (${agents.length}):
+      ${for agent in agents}
+        ${loop_index}. ${agent.name} - ${agent.role}
+      ${endfor}
+      ${endif}
+  
+  - id: "confirm_generation"
+    name: "Confirmar Geração"
+    type: "confirmation"
+    question: "Confirmar e gerar código?"
+    on_cancel:
+      action: "abort"
+      message: "Geração cancelada."
+  
+  - id: "create_directory"
+    name: "Criar Estrutura de Diretórios"
+    type: "file_operation"
+    action: "create_directory"
+    path: "apps/${app_name}"
+  
+  - id: "generate_server"
+    name: "Gerar Servidor MCP"
+    type: "code_generation"
+    template: "templates/openai-compliant-server.ts"
+    output: "apps/${app_name}/src/index.ts"
+    variables:
+      app_name: "${app_name}"
+      app_description: "${app_description}"
+      tools: "${tools}"
+      agents: "${agents}"
+  
+  - id: "generate_package_json"
+    name: "Gerar package.json"
+    type: "code_generation"
+    template: |
+      {
+        "name": "${app_name}",
+        "version": "1.0.0",
+        "description": "${app_description}",
+        "type": "module",
+        "scripts": {
+          "build": "tsc",
+          "start": "node dist/index.js",
+          "dev": "tsx watch src/index.ts",
+          "validate:openai": "npx ts-node ../../builder/src/openai-compliance.ts"
+        },
+        "dependencies": {
+          "@modelcontextprotocol/sdk": "^${MCP_SDK_VERSION}",
+          "zod": "^${ZOD_VERSION}"
+        },
+        "devDependencies": {
+          "@types/node": "^22.10.2",
+          "typescript": "^5.7.2",
+          "tsx": "^4.19.2"
+        }
+      }
+    output: "apps/${app_name}/package.json"
+  
+  - id: "generate_tsconfig"
+    name: "Gerar tsconfig.json"
+    type: "file_operation"
+    action: "copy"
+    source: "templates/tsconfig.json"
+    destination: "apps/${app_name}/tsconfig.json"
+  
+  - id: "generate_readme"
+    name: "Gerar README.md"
+    type: "code_generation"
+    template: "templates/openai-compliant-readme.md"
+    output: "apps/${app_name}/README.md"
+    variables:
+      app_name: "${app_name}"
+      app_description: "${app_description}"
+      app_problem: "${app_problem}"
+      app_user: "${app_user}"
+      tools: "${tools}"
+  
+  # UI Components (se necessário)
+  - id: "generate_ui"
+    name: "Gerar Componentes UI"
+    type: "conditional"
+    condition: "${has_ui} == true"
+    steps:
+      - id: "create_ui_directory"
+        type: "file_operation"
+        action: "create_directory"
+        path: "apps/${app_name}/ui"
+      
+      - id: "generate_widget"
+        type: "code_generation"
+        template: "templates/ui/${ui_type}-template.tsx"
+        output: "apps/${app_name}/ui/Widget.tsx"
+        variables:
+          components: "${ui_components}"
+  
+  # ============================================
+  # BUILD E VALIDAÇÃO
+  # ============================================
+  
+  - id: "install_dependencies"
+    name: "Instalar Dependências"
+    type: "command"
+    command: "npm install"
+    working_directory: "apps/${app_name}"
+  
+  - id: "build_server"
+    name: "Build do Servidor"
+    type: "command"
+    command: "npm run build"
+    working_directory: "apps/${app_name}"
+  
+  - id: "validate_compliance"
+    name: "Validar Compliance OpenAI"
+    type: "command"
+    command: "npm run validate:openai"
+    working_directory: "apps/${app_name}"
+    on_failure:
+      action: "display_errors"
+      continue: false
+  
+  # ============================================
+  # FINALIZAÇÃO
+  # ============================================
+  
+  - id: "success_message"
+    name: "Mensagem de Sucesso"
+    type: "display"
+    template: |
+      ✅ App criado com sucesso!
+      
+      📁 Localização: apps/${app_name}
+      
+      Próximos passos:
+      1. cd apps/${app_name}
+      2. npm run dev (testar localmente)
+      3. npm run validate:openai (validar compliance)
+      4. ../../deploy-fastmcp.sh local (deploy)
+      
+      📚 Documentação:
+      - README.md (instruções de uso)
+      - ../../COMPLETE_GUIDE.md (guia completo)
+      - ../../OPENAI_GUIDELINES.md (compliance)
+      
+      🎉 Seu app segue 100% as OpenAI Apps SDK Guidelines!
+
+# Outputs disponíveis para próximos workflows
+outputs:
+  app_name: "${app_name}"
+  app_path: "apps/${app_name}"
+  tools_count: "${tool_count}"
+  has_ui: "${has_ui}"
+  compliance_status: "validated"

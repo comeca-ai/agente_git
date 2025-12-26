@@ -1,0 +1,19 @@
+{
+  "name": "promessas-ano-novo",
+  "version": "1.0.0",
+  "description": "Gerenciador de promessas de ano novo com lembretes mensais",
+  "main": "server/dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "cd server && tsc",
+    "test": "bash tests/test-all.sh"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  }
+}

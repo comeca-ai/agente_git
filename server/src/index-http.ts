@@ -1,10 +1,9 @@
 /**
- * MCP Server - Bible Daily App
- * Following Apps SDK + FastMCP guidelines
+ * MCP Server - Bible Daily App (HTTP Server with Auth)
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -19,8 +18,12 @@ import {
   formatVerse,
   type Verse,
 } from "./bible-data.js";
+import http from "http";
 
-// Zod schemas for tool inputs (FastMCP style)
+// API Key (pode ser configurada via env)
+const API_KEY = process.env.MCP_API_KEY || "biblia-diaria-key-2024";
+
+// Zod schemas for tool inputs
 const ObterVersiculoDiarioSchema = z.object({});
 
 const ObterVersiculoPorLivroSchema = z.object({
@@ -38,121 +41,9 @@ const server = new Server(
   {
     capabilities: {
       tools: {},
-      resources: {},
     },
   }
 );
-
-// Register widget as a resource (HTML + Skybridge)
-server.setRequestHandler(ListResourcesRequestSchema, async () => {
-  return {
-    resources: [
-      {
-        uri: "widget://biblia-diaria/main",
-        mimeType: "text/html+skybridge",
-        name: "Widget Bíblia Diária",
-        description: "Interface para visualizar versículos bíblicos",
-      },
-    ],
-  };
-});
-
-server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-  if (request.params.uri === "widget://biblia-diaria/main") {
-    // In production, this would load the compiled widget from web/dist
-    // For now, we'll return a placeholder
-    const widgetHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Bíblia Diária</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      padding: 16px;
-      margin: 0;
-    }
-    .verse-container {
-      background: #f5f5f5;
-      padding: 16px;
-      border-radius: 8px;
-      margin: 16px 0;
-    }
-    .verse-reference {
-      font-weight: bold;
-      color: #333;
-      margin-bottom: 8px;
-    }
-    .verse-text {
-      color: #555;
-      line-height: 1.6;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin: 4px;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-  </style>
-</head>
-<body>
-  <h2>📖 Bíblia Diária</h2>
-  <div id="verse-display"></div>
-  
-  <script>
-    // Access window.openai API for ChatGPT integration
-    const displayVerse = (verse) => {
-      const container = document.getElementById('verse-display');
-      if (verse) {
-        container.innerHTML = \`
-          <div class="verse-container">
-            <div class="verse-reference">\${verse.book} \${verse.chapter}:\${verse.verse}</div>
-            <div class="verse-text">\${verse.text}</div>
-          </div>
-        \`;
-      }
-    };
-    
-    // Listen for tool output from ChatGPT
-    if (window.openai && window.openai.toolOutput) {
-      const output = window.openai.toolOutput;
-      if (output.verse) {
-        displayVerse(output.verse);
-      }
-    }
-    
-    // Initialize widget state
-    if (window.openai && window.openai.setWidgetState) {
-      window.openai.setWidgetState({
-        initialized: true,
-        lastUpdate: new Date().toISOString()
-      });
-    }
-  </script>
-</body>
-</html>
-    `;
-    
-    return {
-      contents: [
-        {
-          uri: request.params.uri,
-          mimeType: "text/html+skybridge",
-          text: widgetHtml,
-        },
-      ],
-    };
-  }
-  
-  throw new Error("Resource not found");
-});
 
 // Register tools
 server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -169,9 +60,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           type: "object",
           properties: {},
         },
-        // Annotations following Apps SDK guidelines
         annotations: {
-          readOnlyHint: true,  // Read-only operation
+          readOnlyHint: true,
         },
       },
       {
@@ -191,9 +81,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
           required: ["livro"],
         },
-        // Annotations following Apps SDK guidelines
         annotations: {
-          readOnlyHint: true,  // Read-only operation
+          readOnlyHint: true,
         },
       },
       {
@@ -207,9 +96,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           type: "object",
           properties: {},
         },
-        // Annotations following Apps SDK guidelines
         annotations: {
-          readOnlyHint: true,  // Read-only operation
+          readOnlyHint: true,
         },
       },
     ],
@@ -289,14 +177,95 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 
-// Start server
-async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Bible Daily MCP Server running on stdio");
+// Middleware de autenticação
+function checkAuth(req: http.IncomingMessage): boolean {
+  const authHeader = req.headers['authorization'];
+  const apiKey = req.headers['x-api-key'];
+  
+  // Aceitar Authorization: Bearer <key> ou X-API-Key: <key>
+  if (authHeader && authHeader === `Bearer ${API_KEY}`) {
+    return true;
+  }
+  
+  if (apiKey && apiKey === API_KEY) {
+    return true;
+  }
+  
+  return false;
 }
 
-main().catch((error) => {
-  console.error("Server error:", error);
-  process.exit(1);
+// Create HTTP server with SSE transport
+const PORT = process.env.PORT || 3000;
+
+const httpServer = http.createServer(async (req, res) => {
+  // CORS headers para permitir requisições do ChatGPT
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key');
+  
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+
+  // Health check público (sem auth)
+  if (req.url === "/health") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ 
+      status: "ok", 
+      server: "biblia-diaria-mcp",
+      auth: "required"
+    }));
+    return;
+  }
+
+  // Endpoints protegidos - requerem autenticação
+  if (req.url === "/sse" || req.url === "/messages") {
+    if (!checkAuth(req)) {
+      res.writeHead(401, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ 
+        error: "Unauthorized",
+        message: "Valid API key required. Use Authorization: Bearer <key> or X-API-Key: <key>"
+      }));
+      return;
+    }
+  }
+
+  if (req.url === "/sse") {
+    const transport = new SSEServerTransport("/messages", res);
+    await server.connect(transport);
+    return;
+  }
+
+  if (req.url === "/messages" && req.method === "POST") {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+    req.on("end", async () => {
+      try {
+        const message = JSON.parse(body);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ received: true }));
+      } catch (error) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Invalid JSON" }));
+      }
+    });
+    return;
+  }
+
+  res.writeHead(404, { "Content-Type": "text/plain" });
+  res.end("Not Found");
+});
+
+httpServer.listen(PORT, () => {
+  console.error(`Bible Daily MCP Server (HTTP with Auth) running on port ${PORT}`);
+  console.error(`Health check: http://localhost:${PORT}/health`);
+  console.error(`SSE endpoint: http://localhost:${PORT}/sse`);
+  console.error(`API Key: ${API_KEY}`);
+  console.error(`Use header: Authorization: Bearer ${API_KEY}`);
+  console.error(`Or header: X-API-Key: ${API_KEY}`);
 });

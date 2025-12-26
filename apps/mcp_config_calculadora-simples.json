@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "calculadora-simples": {
+      "command": "node",
+      "args": ["/workspaces/agente_git/apps/calculadora-simples/server/dist/index.js"]
+    }
+  }
+}

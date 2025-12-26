@@ -1,0 +1,21 @@
+{
+  "name": "fastmcp-builder",
+  "version": "1.0.0",
+  "description": "FastMCP App Builder with Node.js + Inquirer",
+  "type": "module",
+  "scripts": {
+    "build": "tsc create-app-easy.ts --target ES2020 --module ESNext --moduleResolution node --resolveJsonModule --esModuleInterop",
+    "start": "node create-app-easy.js"
+  },
+  "dependencies": {
+    "inquirer": "^9.2.12",
+    "chalk": "^5.3.0",
+    "ora": "^7.0.1",
+    "boxen": "^7.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "@types/inquirer": "^9.0.7",
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "biblia-diaria": {
+      "url": "https://statutorily-sourceless-avis.ngrok-free.dev/sse",
+      "transport": "sse",
+      "headers": {
+        "Authorization": "Bearer biblia-diaria-key-2024"
+      }
+    }
+  }
+}

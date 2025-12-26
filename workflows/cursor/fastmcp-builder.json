@@ -1,0 +1,278 @@
+{
+  "name": "FastMCP App Builder",
+  "description": "Cria aplicações MCP seguindo OpenAI Apps SDK Guidelines",
+  "version": "1.0.0",
+  "triggers": {
+    "commands": [
+      "criar app mcp",
+      "novo app chatgpt",
+      "fastmcp app",
+      "criar servidor mcp"
+    ]
+  },
+  "steps": [
+    {
+      "id": "welcome",
+      "type": "message",
+      "content": "# 🚀 FastMCP App Builder\n\nVamos criar seu ChatGPT App seguindo guidelines FastMCP!\n\n**Princípios:**\n• 1 tool = 1 intention\n• Schemas explícitos com Zod\n• Respostas enxutas e previsíveis\n• UX nativa do ChatGPT"
+    },
+    {
+      "id": "step1_use_case",
+      "type": "section",
+      "title": "📝 PASSO 1: Use Case (OpenAI Framework)",
+      "questions": [
+        {
+          "id": "app_problem",
+          "prompt": "Qual problema seu app resolve?",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "app_user",
+          "prompt": "Quem é o usuário-alvo?",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "app_name",
+          "prompt": "Nome do seu app:",
+          "type": "text",
+          "required": true,
+          "validation": {
+            "pattern": "^[a-z0-9-]+$",
+            "message": "Use kebab-case (ex: clima-diario)"
+          }
+        },
+        {
+          "id": "app_description",
+          "prompt": "Descrição curta (1 linha):",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "step1_ui",
+      "type": "section",
+      "title": "🎨 Interface Visual (UI Guidelines)",
+      "questions": [
+        {
+          "id": "has_ui",
+          "prompt": "O app terá interface visual?",
+          "type": "boolean",
+          "default": false
+        }
+      ],
+      "conditionalSteps": [
+        {
+          "condition": "has_ui === true",
+          "questions": [
+            {
+              "id": "ui_type",
+              "prompt": "Tipo de interface:",
+              "type": "select",
+              "options": [
+                {
+                  "value": "widget",
+                  "label": "Widget React (cards, listas, gráficos)"
+                },
+                {
+                  "value": "canvas",
+                  "label": "Canvas (visualizações customizadas)"
+                },
+                {
+                  "value": "form",
+                  "label": "Form (entrada de dados)"
+                },
+                {
+                  "value": "mixed",
+                  "label": "Mista (combinação)"
+                }
+              ]
+            },
+            {
+              "id": "ui_components",
+              "prompt": "Que componentes precisa? (ex: tabela, gráfico, formulário)",
+              "type": "text"
+            },
+            {
+              "id": "use_ui_agent",
+              "prompt": "Criar agente especializado em UI Guidelines?",
+              "type": "boolean",
+              "default": true,
+              "help": "Agente que garante: widgets nativos, design responsivo, acessibilidade, performance <100ms"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "step2_tools",
+      "type": "section",
+      "title": "🔧 PASSO 2: Tools (Capabilities)",
+      "description": "FastMCP recomenda 1-3 tools máximo. Cada tool = 1 ação clara.",
+      "questions": [
+        {
+          "id": "tool_count",
+          "prompt": "Quantas tools? [1-3]:",
+          "type": "number",
+          "min": 1,
+          "max": 3,
+          "required": true
+        }
+      ],
+      "loop": {
+        "count": "{{tool_count}}",
+        "questions": [
+          {
+            "id": "tool_name_{{index}}",
+            "prompt": "Tool {{index}} - Nome (snake_case):",
+            "type": "text",
+            "required": true,
+            "validation": {
+              "pattern": "^[a-z_]+$",
+              "message": "Use snake_case (ex: obter_clima)"
+            }
+          },
+          {
+            "id": "tool_desc_{{index}}",
+            "prompt": "Tool {{index}} - Descrição (o que faz?):",
+            "type": "text",
+            "required": true
+          },
+          {
+            "id": "tool_params_{{index}}",
+            "prompt": "Tool {{index}} - Parâmetros (vírgula ou 'nenhum'):",
+            "type": "text",
+            "default": "nenhum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "step3_agents",
+      "type": "section",
+      "title": "🤖 PASSO 3: Agentes (Orchestration)",
+      "questions": [
+        {
+          "id": "use_agents",
+          "prompt": "Usar sistema de agentes?",
+          "type": "boolean",
+          "default": false
+        }
+      ],
+      "conditionalSteps": [
+        {
+          "condition": "use_agents === true && use_ui_agent === true",
+          "message": "✓ UIGuidelinesAgent adicionado automaticamente"
+        },
+        {
+          "condition": "use_agents === true",
+          "questions": [
+            {
+              "id": "extra_agent_count",
+              "prompt": "Quantos agentes adicionais? [0-3]:",
+              "type": "number",
+              "min": 0,
+              "max": 3
+            }
+          ],
+          "loop": {
+            "count": "{{extra_agent_count}}",
+            "questions": [
+              {
+                "id": "agent_name_{{index}}",
+                "prompt": "Agente {{index}} - Nome:",
+                "type": "text",
+                "required": true
+              },
+              {
+                "id": "agent_role_{{index}}",
+                "prompt": "Agente {{index}} - Função/especialidade:",
+                "type": "text",
+                "required": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "summary",
+      "type": "message",
+      "content": "# 📋 RESUMO DO SEU APP\n\n**App:** {{app_name}}\n**Problema:** {{app_problem}}\n**Usuário:** {{app_user}}\n**Descrição:** {{app_description}}\n\n{{#if has_ui}}\n**Interface:** Sim\n  Tipo: {{ui_type}}\n  Componentes: {{ui_components}}\n  {{#if use_ui_agent}}✓ Com agente de UI Guidelines{{/if}}\n{{/if}}\n\n**Tools ({{tool_count}}):**\n{{#each tools}}\n  {{inc @index}}. {{this.name}} - {{this.description}}\n     {{#if this.params !== 'nenhum'}}Parâmetros: {{this.params}}{{/if}}\n{{/each}}\n\n{{#if use_agents}}\n**Agentes ({{agents.length}}):**\n{{#each agents}}\n  {{inc @index}}. {{this.name}} - {{this.role}}\n{{/each}}\n{{/if}}"
+    },
+    {
+      "id": "confirm",
+      "type": "confirmation",
+      "prompt": "Confirmar e gerar código?",
+      "cancelMessage": "❌ Geração cancelada."
+    },
+    {
+      "id": "generate_code",
+      "type": "action",
+      "action": "runCommand",
+      "command": "mkdir -p apps/{{app_name}}/src && echo 'Criando estrutura...'"
+    },
+    {
+      "id": "generate_server",
+      "type": "action",
+      "action": "createFile",
+      "template": "../../templates/openai-compliant-server.ts",
+      "output": "apps/{{app_name}}/src/index.ts",
+      "variables": {
+        "APP_NAME": "{{app_name}}",
+        "APP_DESCRIPTION": "{{app_description}}",
+        "TOOLS": "{{tools}}",
+        "AGENTS": "{{agents}}"
+      }
+    },
+    {
+      "id": "generate_package",
+      "type": "action",
+      "action": "createFile",
+      "output": "apps/{{app_name}}/package.json",
+      "content": "{\n  \"name\": \"{{app_name}}\",\n  \"version\": \"1.0.0\",\n  \"description\": \"{{app_description}}\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"build\": \"tsc\",\n    \"start\": \"node dist/index.js\",\n    \"dev\": \"tsx watch src/index.ts\",\n    \"validate:openai\": \"npx ts-node ../../builder/src/openai-compliance.ts\"\n  },\n  \"dependencies\": {\n    \"@modelcontextprotocol/sdk\": \"^1.25.1\",\n    \"zod\": \"^4.2.1\"\n  },\n  \"devDependencies\": {\n    \"@types/node\": \"^22.10.2\",\n    \"typescript\": \"^5.7.2\",\n    \"tsx\": \"^4.19.2\"\n  }\n}"
+    },
+    {
+      "id": "install_deps",
+      "type": "action",
+      "action": "runCommand",
+      "command": "cd apps/{{app_name}} && npm install",
+      "description": "Instalando dependências..."
+    },
+    {
+      "id": "build",
+      "type": "action",
+      "action": "runCommand",
+      "command": "cd apps/{{app_name}} && npm run build",
+      "description": "Building servidor..."
+    },
+    {
+      "id": "validate",
+      "type": "action",
+      "action": "runCommand",
+      "command": "cd apps/{{app_name}} && npm run validate:openai",
+      "description": "Validando compliance OpenAI..."
+    },
+    {
+      "id": "success",
+      "type": "message",
+      "content": "# ✅ App criado com sucesso!\n\n📁 **Localização:** apps/{{app_name}}\n\n## Próximos passos:\n\n1. `cd apps/{{app_name}}`\n2. `npm run dev` (testar localmente)\n3. `npm run validate:openai` (validar compliance)\n4. `../../deploy-fastmcp.sh local` (deploy)\n\n## 📚 Documentação:\n\n- README.md (instruções de uso)\n- ../../COMPLETE_GUIDE.md (guia completo)\n- ../../OPENAI_GUIDELINES.md (compliance)\n\n🎉 **Seu app segue 100% as OpenAI Apps SDK Guidelines!**"
+    }
+  ],
+  "metadata": {
+    "author": "FastMCP Builder",
+    "tags": ["mcp", "openai", "fastmcp", "chatgpt", "apps-sdk"],
+    "requirements": {
+      "node": ">=18.0.0",
+      "npm": ">=8.0.0"
+    },
+    "references": [
+      "https://developers.openai.com/apps-sdk/plan/use-case",
+      "https://developers.openai.com/apps-sdk/build/mcp-server",
+      "https://developers.openai.com/apps-sdk/concepts/ui-guidelines",
+      "https://developers.openai.com/apps-sdk/deploy"
+    ]
+  }
+}

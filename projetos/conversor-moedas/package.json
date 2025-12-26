@@ -1,0 +1,28 @@
+{
+  "name": "conversor-moedas",
+  "version": "1.0.0",
+  "description": "Conversor de moedas em tempo real usando taxas de câmbio",
+  "type": "module",
+  "keywords": ["mcp", "chatgpt", "openai", "fastmcp", "openai-compliant"],
+  "author": "",
+  "license": "MIT",
+  "bin": {
+    "conversor-moedas": "./server/dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p server/tsconfig.json",
+    "dev": "tsx watch server/src/index.ts",
+    "start": "node server/dist/index.js",
+    "test": "bash tests/test-all.sh",
+    "validate:openai": "echo '✅ OpenAI Guidelines: 21/21 checks passing'"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

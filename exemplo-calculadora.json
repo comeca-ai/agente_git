@@ -1,0 +1,39 @@
+{
+  "name": "calculadora-simples",
+  "problem": "Fazer cálculos matemáticos no ChatGPT",
+  "userStory": "Usuários que precisam calcular rapidamente",
+  "description": "Calculadora que realiza operações matemáticas básicas",
+  "useWidget": true,
+  "widgetType": "widget",
+  "widgetComponents": "tabela de resultados",
+  "tools": [
+    {
+      "name": "calcular",
+      "description": "Calcula operações matemáticas (+, -, *, /)",
+      "parameters": [
+        {
+          "name": "numero1",
+          "type": "number",
+          "description": "Primeiro número da operação"
+        },
+        {
+          "name": "numero2",
+          "type": "number",
+          "description": "Segundo número da operação"
+        },
+        {
+          "name": "operacao",
+          "type": "string",
+          "description": "Operação: add, subtract, multiply, divide"
+        }
+      ]
+    }
+  ],
+  "useAgents": false,
+  "automation": {
+    "git": true,
+    "deploy": true,
+    "deployCloud": false,
+    "test": true
+  }
+}

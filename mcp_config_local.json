@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "biblia-diaria": {
+      "command": "/home/codespace/nvm/current/bin/node",
+      "args": [
+        "/workspaces/agente_git/server/dist/index-fastmcp.js"
+      ],
+      "env": {}
+    }
+  }
+}
