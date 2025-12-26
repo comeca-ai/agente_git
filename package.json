@@ -1,0 +1,29 @@
+{
+  "name": "biblia-diaria-mcp",
+  "version": "0.1.0",
+  "description": "Bible Daily App - ChatGPT App using MCP + React widget",
+  "type": "module",
+  "main": "server/dist/index.js",
+  "scripts": {
+    "build:server": "tsc",
+    "build:web": "cd web && npm run build",
+    "build": "npm run build:server && npm run build:web",
+    "start:server": "node server/dist/index.js",
+    "dev:server": "tsc && node server/dist/index.js",
+    "dev:web": "cd web && npm run dev",
+    "test": "echo \"Tests not yet implemented\" && exit 0"
+  },
+  "keywords": ["mcp", "chatgpt", "bible", "agent"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.1",
+    "@openai/agents": "^0.3.7",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
